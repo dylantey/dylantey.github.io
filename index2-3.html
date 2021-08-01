@@ -1,0 +1,214 @@
+<!doctype html>
+<html>
+<head>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+</head>
+<body>
+    <h1>
+        Student Loan Crisis?
+    </h1>
+    <br>
+        Since student debt at graduation in current dollars did not increase exponentially even though the cost of attending a university did, do graduates' earning increase exponentially as well?
+    </br>
+    <br>
+        As you can see below, the average starting salary for new graduates only increased slightly.
+    </br>
+    <br>
+        Since these are all in current dollars, what if we took a look at them in 2020 dollars?
+    </br>
+
+<svg width="800" height="600"></svg>
+<script>
+
+        var tuition_dataset = [
+        [1975,10140],[1980,14680],[1985,24260],[1990,34560],[1995,46240],[1996,48240],[1997,51000],[1998,53660],[1999,56460],[2000,59120],[2001,61360],[2002,65780],[2003,69080],[2004,73180],[2005,77700],[2006,81720],[2007,86680],[2008,91100],[2009,96340],[2010,100620],[2011,105300],[2012,110260],[2013,114540],[2014,118680],[2015,122760],[2016,126900],[2017,131000],[2018,135580],[2019,139380],[2020,143640] 
+        ];
+
+        var debt_dataset = [
+        [1975,1000],[1980,3900],[1985,5200],[1990,6760],[1995,12600],
+        [1996,12750],[1997,13670],[1998,14590],[1999,15510],[2000,17350],
+        [2001,16900],[2002,18870],[2003,16070],[2004,18650],[2005,20000],
+        [2006,26900],[2007,28500],[2008,23300],[2009,23000],[2010,24200],
+        [2011,25300],[2012,29400],[2013,28900],[2014,28650],[2015,28400],
+        [2016,28525],[2017,28650],[2018,29200],[2019,29500],[2020,30000]
+        ];
+
+        var start_salary_dataset = [
+            [1975,12095],[1976,12730],[1977,13772],[1978,15051],[1979,16692],[1980,18553],[1981,20906],[1982,22449],[1983,22161],[1984,23278],[1985,24289],[1986,24752],[1987,24169],[1988,25886],[1989,26297],[1990,27526],[1991,28030],[1992,28111],[1993,28088],[1994,28169],[1995,29276],[1996,30728],[1997,32047],[1998,34471],[1999,35595],[2000,39824],[2001,42557],[2002,40162],[2003,39296],[2004,39960],[2005,42081],[2006,43321],[2007,45725],[2008,49224],[2009,48633],[2010,48288],[2011,51171],[2012,44259],[2013,45327],[2014,48127],[2015,50219],[2019,53889]
+        ];
+
+        var svg = d3.select("svg"),
+            margin = 200,
+            width = svg.attr("width") - margin,
+            height = svg.attr("height") - margin
+
+        var xScale = d3.scaleLinear().domain([1975, 2020]).range([0, width]);
+        var yScale = d3.scaleLinear().domain([0, 300000]).range([height, 0]);
+            
+        var g = svg.append("g")
+            .attr("transform", "translate(" + 100 + "," + 100 + ")");
+
+        // Title
+        svg.append('text')
+        .attr('x', width/2 + 100)
+        .attr('y', 80)
+        .attr('text-anchor', 'middle')
+        .style('font-family', 'Helvetica')
+        .style('font-size', 16)
+        .text('In Current Dollars');
+        
+        // x-axis
+        svg.append('text')
+        .attr('x', width/2 + 100)
+        .attr('y', height - 15 + 150)
+        .attr('text-anchor', 'middle')
+        .style('font-family', 'Helvetica')
+        .style('font-size', 12)
+        .text('Year');
+        
+        // y-axis
+        svg.append('text')
+        .attr('text-anchor', 'middle')
+        .attr('transform', 'translate(40,' + 300 + ')rotate(-90)')
+        .style('font-family', 'Helvetica')
+        .style('font-size', 12)
+        .text('Cost ($)');
+
+        g.append("g")
+         .attr("transform", "translate(0," + height + ")")
+         .call(d3.axisBottom(xScale).ticks(8).tickFormat(d3.format("d"))); // .tickFormat(d3.format("d")) to remove comma
+        
+        g.append("g")
+         .call(d3.axisLeft(yScale));
+        
+        svg.append('g')
+        .selectAll("dot")
+        .data(tuition_dataset)
+        .enter()
+        .append("circle")
+        .attr("cx", function (d) { return xScale(d[0]); } )
+        .attr("cy", function (d) { return yScale(d[1]); } )
+        .attr("r", 3)
+        .attr("transform", "translate(" + 100 + "," + 100 + ")")
+        .style("fill", "#FF0000");
+
+        // debt dataset
+        svg.append('g')
+        .selectAll("dot")
+        .data(debt_dataset)
+        .enter()
+        .append("circle")
+        .attr("cx", function (d) { return xScale(d[0]); } )
+        .attr("cy", function (d) { return yScale(d[1]); } )
+        .attr("r", 3)
+        .attr("transform", "translate(" + 100 + "," + 100 + ")")
+        .style("fill", "#2664F5");
+
+        // start_salary_dataset
+        svg.append('g')
+        .selectAll("dot")
+        .data(start_salary_dataset)
+        .enter()
+        .append("circle")
+        .attr("cx", function (d) { return xScale(d[0]); } )
+        .attr("cy", function (d) { return yScale(d[1]); } )
+        .attr("r", 3)
+        .attr("transform", "translate(" + 100 + "," + 100 + ")")
+        .style("fill", "#008000");
+
+        // function to draw lines 
+        var line = d3.line()
+        .x(function(d) { return xScale(d[0]); }) 
+        .y(function(d) { return yScale(d[1]); }) 
+        .curve(d3.curveMonotoneX)
+        
+        // tuition dataset
+        svg.append("path")
+        .datum(tuition_dataset) 
+        .attr("class", "line") 
+        .attr("transform", "translate(" + 100 + "," + 100 + ")")
+        .attr("d", line)
+        .style("fill", "none")
+        .style("stroke", "#FF0000")
+        .style("stroke-width", "2");
+
+        // debt dataset
+        svg.append("path")
+        .datum(debt_dataset) 
+        .attr("class", "line") 
+        .attr("transform", "translate(" + 100 + "," + 100 + ")")
+        .attr("d", line)
+        .style("fill", "none")
+        .style("stroke", "#2664F5")
+        .style("stroke-width", "2");
+
+        // starting salary dataset
+        svg.append("path")
+        .datum(start_salary_dataset) 
+        .attr("class", "line") 
+        .attr("transform", "translate(" + 100 + "," + 100 + ")")
+        .attr("d", line)
+        .style("fill", "none")
+        .style("stroke", "#008000")
+        .style("stroke-width", "2");
+
+        // Legend
+        svg.append('rect')
+        .attr('height', 15)
+        .attr('width', 15)
+        .attr('x', 480)
+        .attr('y', 543)
+        .style('fill', "#CC0000")
+
+        svg.append('text')
+        .attr('lignment-baselin', 'middle')
+        .attr('x', 500)
+        .attr('y', 555)
+        .style('font-family', 'Helvetica')
+        .style('font-size', 12)
+        .text('Total cost to attend a four-year university');
+
+        //debt
+        svg.append('rect')
+        .attr('height', 15)
+        .attr('width', 15)
+        .attr('x', 480)
+        .attr('y', 563)
+        .style('fill', "#2664F5")
+
+        svg.append('text')
+        .attr('lignment-baselin', 'middle')
+        .attr('x', 500)
+        .attr('y', 575)
+        .style('font-family', 'Helvetica')
+        .style('font-size', 12)
+        .text('Average Student Debt at Graduation');
+
+        // starting salary
+        svg.append('rect')
+        .attr('height', 15)
+        .attr('width', 15)
+        .attr('x', 480)
+        .attr('y', 583)
+        .style('fill', "#008000")
+
+        svg.append('text')
+        .attr('lignment-baselin', 'middle')
+        .attr('x', 500)
+        .attr('y', 595)
+        .style('font-family', 'Helvetica')
+        .style('font-size', 12)
+        .text('Average Starting Salary After Graduation');
+  
+</script>
+<p>
+    <button type="button" onclick="window.location.href='index2-2.html'">
+        Prev
+    </button>
+    <button type="button" onclick="window.location.href='index2-4.html'">
+        Next
+    </button>
+</p>
+
+</body>
+</html>
